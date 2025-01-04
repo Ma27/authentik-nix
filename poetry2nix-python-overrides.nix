@@ -18,6 +18,13 @@ pkgs:
       xmlsec = prev.xmlsec.overridePythonAttrs (oA: {
         nativeBuildInputs = oA.nativeBuildInputs ++ [ final.setuptools final.pkgconfig ];
         buildInputs = [ pkgs.xmlsec.dev pkgs.xmlsec pkgs.libxml2 pkgs.libtool ];
+        patches = (oA.patches or []) ++ [
+          # From https://github.com/NixOS/nixpkgs/commit/57f6fd617558799b60bc418adec4edd767ac10c2
+          (pkgs.fetchpatch {
+            url = "https://github.com/xmlsec/python-xmlsec/commit/67cd4ac73e4fceac4b4eb6a320067cad33f79213.patch";
+            hash = "sha256-zU34a2x3S48Hwvo/oDe5mfkZ3jBwdajIrKwKhTRSsko=";
+          })
+        ];
       });
       opencontainers = prev.opencontainers.overrideAttrs (oA: {
         nativeBuildInputs = oA.nativeBuildInputs ++ [
@@ -122,6 +129,9 @@ pkgs:
          pkgs.krb5
        ];
        pythonImportsCheck = [ "kadmin" ];
+       NIX_CFLAGS_COMPILE = (oA.NIX_CFLAGS_COMPILE or []) ++ [
+         "-Wno-error=int-conversion"
+       ];
      });
      gssapi = prev.gssapi.overrideAttrs (oA: {
        nativeBuildInputs = oA.nativeBuildInputs ++ [
